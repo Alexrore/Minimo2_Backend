@@ -1,0 +1,78 @@
+package edu.upc.dsa.services;
+
+import edu.upc.dsa.UserManager;
+import edu.upc.dsa.UserManagerImpl;
+import edu.upc.dsa.modelos.User;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+@Api(value = "/usuarios", description = "Servicios de usuarios")
+@Path("/usuarios")
+public class Servicio {
+
+    private UserManager m = UserManagerImpl.getInstance();
+
+    @POST
+    @Path("/registro")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Registrar nuevo usuario", notes = "Crea un nuevo usuario si el email no existe")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Usuario creado correctamente"),
+            @ApiResponse(code = 400, message = "Datos de usuario inválidos o incompletos"),
+            @ApiResponse(code = 409, message = "Email ya registrado"),
+            @ApiResponse(code = 500, message = "Error interno del servidor")
+    })
+    public Response registrarUsuario(User u) {
+        try {
+            if (u == null || u.getNombre() == null || u.getEmail() == null || u.getPassword() == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Faltan datos obligatorios (nombre, email o contraseña)").build();
+            }
+
+            User nuevo = m.registrarUsuario(u.getNombre(), u.getEmail(), u.getPassword());
+
+            if (nuevo == null) {
+                return Response.status(Response.Status.CONFLICT)
+                        .entity("El email ya está registrado").build();
+            }
+
+            return Response.status(Response.Status.CREATED).entity(nuevo).build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error interno del servidor: " + e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/{email}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Obtener usuario por email", notes = "Devuelve el usuario si existe")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Usuario encontrado"),
+            @ApiResponse(code = 404, message = "Usuario no encontrado"),
+            @ApiResponse(code = 500, message = "Error interno del servidor")
+    })
+    public Response getUsuario(@PathParam("email") String email) {
+        try {
+            User u = m.getUsuario(email);
+            if (u == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("Usuario no encontrado").build();
+            }
+            return Response.ok(u).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error interno del servidor: " + e.getMessage()).build();
+        }
+    }
+}
