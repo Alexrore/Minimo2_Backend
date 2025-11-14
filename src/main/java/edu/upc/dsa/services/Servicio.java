@@ -16,7 +16,7 @@ public class Servicio {
     private UserManager m = UserManagerImpl.getInstance();
 
     @POST
-    @Path("/registro")
+    @Path("/register")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Registrar nuevo usuario", notes = "Crea un nuevo usuario si el email no existe")
@@ -28,7 +28,7 @@ public class Servicio {
     })
     public Response registrarUsuario(User u) {
         try {
-            if (u == null || u.getNombre() == null || u.getEmail() == null || u.getPassword() == null) {
+            if (u == null || u.getEmail() == null || u.getPassword() == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Faltan datos obligatorios (nombre, email o contraseña)").build();
             }
