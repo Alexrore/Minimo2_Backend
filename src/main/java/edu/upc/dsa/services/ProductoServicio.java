@@ -26,7 +26,7 @@ public class ProductoServicio {
         }
     }
 
-    @GET // Método HTTP GET
+    @GET // Metodo HTTP GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Obtener el listado de productos de la tienda",
