@@ -3,6 +3,7 @@ package edu.upc.dsa.services;
 import edu.upc.dsa.UserManager;
 import edu.upc.dsa.UserManagerImpl;
 import edu.upc.dsa.modelos.User;
+import edu.upc.dsa.modelos.Verificacion;
 import io.swagger.annotations.*;
 
 import javax.ws.rs.*;
@@ -52,13 +53,71 @@ public class Servicio {
                 return Response.status(Response.Status.CONFLICT)
                         .entity("El email ya está registrado").build();
             }
+            boolean enviado = m.enviarCodigoVerificacion(u.getEmail());
 
-            return Response.status(Response.Status.CREATED).entity(nuevo).build();
+            if (!enviado) {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity("Error al enviar código de verificación").build();
+            }
+
+            return Response.status(Response.Status.CREATED)
+                    .entity("Usuario creado. Revisa tu email para el código de verificación.").build();
+
 
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error interno del servidor: " + e.getMessage()).build();
+        }
+    }
+    @POST
+    @Path("/verificar-codigo")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Verificar código de email", notes = "Valida el código de 6 dígitos enviado")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Email verificado correctamente"),
+            @ApiResponse(code = 400, message = "Código incorrecto o expirado"),
+            @ApiResponse(code = 404, message = "Usuario no encontrado"),
+            @ApiResponse(code = 500, message = "Error interno del servidor")
+    })
+    public Response verificarCodigo(Verificacion req) {
+        try {
+            if (req == null || req.getEmail() == null || req.getCodigo() == null ||
+                    req.getEmail().trim().isEmpty() || req.getCodigo().trim().isEmpty()) {
+
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\":\"Email y código son obligatorios\"}")
+                        .build();
+            }
+
+            String email = req.getEmail();
+            String codigo = req.getCodigo();
+
+            User usuario = m.getUsuario(email);
+
+            if (usuario == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("{\"error\":\"Usuario no encontrado\"}")
+                        .build();
+            }
+
+            boolean verificado = m.verificarCodigo(email, codigo);
+
+            if (!verificado) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\":\"Código incorrecto\"}")
+                        .build();
+            }
+
+            return Response.status(Response.Status.OK)
+                    .entity("{\"mensaje\":\"Email verificado correctamente. Ya puedes iniciar sesión.\"}")
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\":\"Error interno del servidor: " + e.getMessage() + "\"}")
+                    .build();
         }
     }
 
@@ -71,6 +130,7 @@ public class Servicio {
             @ApiResponse(code = 200, message = "Login exitoso", response = User.class),
             @ApiResponse(code = 400, message = "Faltan email o contraseña"),
             @ApiResponse(code = 401, message = "Credenciales inválidas (email o contraseña incorrectos)"),
+            @ApiResponse(code = 403, message = "Email no verificado"),
             @ApiResponse(code = 500, message = "Error interno del servidor")
     })
     public Response loginUsuario(User u) {
@@ -86,7 +146,10 @@ public class Servicio {
                 return Response.status(Response.Status.UNAUTHORIZED) // 401 Unauthorized
                         .entity("Credenciales inválidas").build();
             }
-
+            if (!usuarioLogueado.isEmailVerificado()) {
+                return Response.status(Response.Status.FORBIDDEN)
+                        .entity("Por favor verifica tu email antes de iniciar sesión.").build();
+            }
             // Si el login es exitoso, se devuelve el usuario
             return Response.status(Response.Status.OK).entity(usuarioLogueado).build();
 

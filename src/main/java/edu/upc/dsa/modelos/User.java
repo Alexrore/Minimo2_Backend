@@ -6,6 +6,9 @@ public class User {
     private String email;
     private String password;
     private int monedas;
+    private boolean emailVerificado;
+    private String codigoVerificacion;
+
 
     public User() {}
 
@@ -14,8 +17,8 @@ public class User {
         this.nombre = nombre;
         this.email = email;
         this.password = password;
-        //this.monedas = monedas;
-
+        this.monedas = 0;
+        this.emailVerificado = false;
     }
 
     public String getId() {
@@ -48,6 +51,31 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isEmailVerificado() {
+        return emailVerificado;
+    }
+
+    public void setEmailVerificado(boolean emailVerificado) {
+        this.emailVerificado = emailVerificado;
+    }
+
+    public String getCodigoVerificacion() {
+        return codigoVerificacion;
+    }
+
+    public void setCodigoVerificacion(String codigoVerificacion) {
+        this.codigoVerificacion = codigoVerificacion;
+    }
+
+
+    public int getMonedas() {
+        return monedas;
+    }
+
+    public void setMonedas(int monedas) {
+        this.monedas = monedas;
     }
 }
 

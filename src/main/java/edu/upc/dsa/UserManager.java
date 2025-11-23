@@ -8,4 +8,6 @@ public interface UserManager {
     User loginUsuario(String email, String password);
     User getUsuario(String email);
     List<User> getUsuarios();
+    boolean enviarCodigoVerificacion(String email);
+    boolean verificarCodigo(String email, String codigo);
 }
