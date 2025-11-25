@@ -1,6 +1,8 @@
 package edu.upc.dsa;
 
 import edu.upc.dsa.modelos.Producto;
+import edu.upc.dsa.modelos.User;
+import edu.upc.dsa.UserManagerImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -57,5 +59,40 @@ public class ProductoManagerImpl implements ProductoManager {
             }
         }
         return null;
+    }
+
+    // NUEVA FUNCIÓN: Comprar Producto
+    // Devuelve un código:
+    // 0 = Éxito
+    // 1 = Usuario no encontrado
+    // 2 = Producto no encontrado
+    // 3 = No hay saldo suficiente
+    @Override
+    public int comprarProducto(String nombreProducto, String emailUsuario) {
+
+        // 1. Buscamos el producto en el catálogo
+        Producto p = this.getproducto(nombreProducto);
+        if (p == null) return 2; // Producto no existe
+
+        // 2. Buscamos al usuario (Llamamos al OTRO manager)
+        // Nota: Usamos getInstance() porque es Singleton
+        User u = UserManagerImpl.getInstance().getUsuario(emailUsuario);
+        if (u == null) return 1; // Usuario no existe
+
+        // 3. Verificamos si tiene dinero
+        if (u.getMonedas() < p.getPrecio()) {
+            return 3; // No tiene "pasta"
+        }
+
+        // 4. REALIZAR LA TRANSACCIÓN
+        // Restamos dinero
+        u.setMonedas(u.getMonedas() - p.getPrecio());
+
+        // Añadimos al inventario (usando el método que creamos antes)
+        u.addObjetoInventario(p.getNombreproducto(), 1);
+
+        System.out.println("Compra realizada: " + u.getNombre() + " compró " + p.getNombreproducto());
+
+        return 0; // Todo OK
     }
 }

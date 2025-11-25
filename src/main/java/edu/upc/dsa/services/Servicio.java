@@ -183,4 +183,33 @@ public class Servicio {
                     .entity("Error interno del servidor: " + e.getMessage()).build();
         }
     }
+
+    @PUT
+    @Path("/monedas/{email}/{cantidad}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Modificar monedas (Dev/Test)", notes = "Permite establecer las monedas de un usuario manualmente")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Monedas actualizadas"),
+            @ApiResponse(code = 404, message = "Usuario no encontrado"),
+            @ApiResponse(code = 500, message = "Error interno")
+    })
+    public Response updateMonedas(@PathParam("email") String email, @PathParam("cantidad") int cantidad) {
+        try {
+            User u = m.getUsuario(email);
+            if (u == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("Usuario no encontrado").build();
+            }
+
+            u.setMonedas(cantidad);
+
+            return Response.status(Response.Status.OK)
+                    .entity("Monedas actualizadas a: " + cantidad).build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error interno: " + e.getMessage()).build();
+        }
+    }
 }

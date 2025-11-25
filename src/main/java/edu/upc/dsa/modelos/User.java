@@ -1,5 +1,7 @@
 package edu.upc.dsa.modelos;
 
+import java.util.HashMap;
+
 public class User {
     private String id;
     private String nombre;
@@ -8,9 +10,11 @@ public class User {
     private int monedas;
     private boolean emailVerificado;
     private String codigoVerificacion;
+    private HashMap<String, Integer> inventario;
 
-
-    public User() {}
+    public User() {
+        this.inventario = new HashMap<>();
+    }
 
     public User(String id, String nombre, String email, String password) {
         this.id = id;
@@ -19,6 +23,25 @@ public class User {
         this.password = password;
         this.monedas = 0;
         this.emailVerificado = false;
+        this.inventario = new HashMap<>();
+    }
+
+    public HashMap<String, Integer> getInventario() {
+        return inventario;
+    }
+
+    public void setInventario(HashMap<String, Integer> inventario) {
+        this.inventario = inventario;
+    }
+
+    public void addObjetoInventario(String nombreObj, int cantidad){
+        if(this.inventario.containsKey(nombreObj)){
+            int cantidadActual = this.inventario.get(nombreObj);
+            this.inventario.put(nombreObj, cantidadActual + cantidad);
+        }
+        else{
+            this.inventario.put(nombreObj, cantidad);
+        }
     }
 
     public String getId() {
