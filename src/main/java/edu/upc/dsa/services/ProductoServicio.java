@@ -21,9 +21,10 @@ public class ProductoServicio {
         this.pm = ProductoManagerImpl.getInstance();
 
         if (pm.listadeproductos().isEmpty()) {
-            pm.anadirproducto("Vendaje", 50);
-            pm.anadirproducto("Machete", 200);
+            pm.anadirproducto("Jeringuilla", 25);
+            pm.anadirproducto("Katana", 200);
             pm.anadirproducto("Chaleco antibalas", 75);
+            pm.anadirproducto("Bloque de energia", 50);
         }
     }
     

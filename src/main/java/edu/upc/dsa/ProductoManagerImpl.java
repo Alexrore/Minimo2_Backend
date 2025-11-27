@@ -61,12 +61,6 @@ public class ProductoManagerImpl implements ProductoManager {
         return null;
     }
 
-    // NUEVA FUNCIÓN: Comprar Producto
-    // Devuelve un código:
-    // 0 = Éxito
-    // 1 = Usuario no encontrado
-    // 2 = Producto no encontrado
-    // 3 = No hay saldo suficiente
     @Override
     public int comprarProducto(String nombreProducto, String emailUsuario) {
 
