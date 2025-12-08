@@ -12,8 +12,8 @@
       <schema-mapping>
         <introspection-scope>
           <node kind="schema">
-            <name qname="@" />
             <name qname="void_gate" />
+            <name qname="@" />
           </node>
         </introspection-scope>
       </schema-mapping>

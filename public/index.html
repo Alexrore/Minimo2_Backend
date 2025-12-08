@@ -445,8 +445,8 @@
                 productos.forEach(p => {
                     // LOGICA DE IMAGEN: Buscamos en el mapa, si no existe, ponemos icono genérico
                     let imgHTML = `<i class="bi bi-box-seam fs-1 text-white"></i>`;
-                    if(IMAGENES_PRODUCTOS[p.nombreproducto]) {
-                        imgHTML = `<img src="${IMAGENES_PRODUCTOS[p.nombreproducto]}" class="product-img" alt="${p.nombreproducto}">`;
+                    if(IMAGENES_PRODUCTOS[p.nombre]) {
+                        imgHTML = `<img src="${IMAGENES_PRODUCTOS[p.nombre]}" class="product-img" alt="${p.nombre}">`;
                     }
 
                     $("#shop-grid").append(`
@@ -455,7 +455,7 @@
                                 <div class="product-img-container">
                                     ${imgHTML}
                                 </div>
-                                <h5 class="text-white">${p.nombreproducto}</h5>
+                                <h5 class="text-white">${p.nombre}</h5>
                                 <div class="item-price mb-3">${p.precio} CR</div>
                                 <button class="btn btn-sm btn-void-primary w-100" onclick="comprarProducto(${p.id})">
                                     COMPRAR
@@ -483,8 +483,8 @@
 
             // 2. Construimos el objeto EXACTO que espera Java (userId e itemId son int)
             const data = {
-                itemId: parseInt(idProducto), // Convertimos a entero
-                userId: parseInt(idUsuario)   // Convertimos a entero
+                itemId: parseInt(idProducto),
+                userId: parseInt(idUsuario)
             };
 
             console.log("Enviando datos al servidor:", JSON.stringify(data));
@@ -562,6 +562,10 @@
             $.ajax({
                 url: URL_USU + "/login", type: "POST", data: JSON.stringify(data), contentType: "application/json",
                 success: function (res) {
+
+                    sessionStorage.setItem("userId", res.id);
+
+
                     showNotification("Acceso Concedido", "success");
                     setTimeout(() => mostrarMenu(res), 800);
                 },
@@ -616,7 +620,7 @@
         });
 
         $("#btnDevForgar").click(function() {
-            const data = { nombreproducto: $("#devProdName").val(), precio: parseFloat($("#devProdPrice").val()) };
+            const data = { nombre: $("#devProdName").val(), precio: parseFloat($("#devProdPrice").val()) };
             $.ajax({
                 url: URL_PROD + "/", type: "POST", data: JSON.stringify(data), contentType: "application/json",
                 success: function() { 

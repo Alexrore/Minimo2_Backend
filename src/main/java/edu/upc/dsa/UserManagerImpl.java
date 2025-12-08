@@ -1,6 +1,8 @@
 package edu.upc.dsa;
 
 import edu.upc.dsa.modelos.User;
+
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 import edu.upc.dsa.dao.*;
 import org.apache.log4j.Logger;
@@ -60,18 +62,6 @@ public class UserManagerImpl implements UserManager {
 
     @Override
     public User loginUsuario(String email, String password) {
-        // Buscamos al usuario por email
-       /* User u = this.getUsuario(email);
-
-        if (u != null) {
-            // Si el usuario existe, se comprueba la contraseña
-            if (u.getPassword().equals(password)) {
-                return u; //Login correcto
-            } else {
-                return null; //Contraseña incorrecta
-            }
-        }
-        return null; // Usuario no encontrado*/
         Session session = null;
         try {
             session = FactorySession.openSession();
@@ -137,27 +127,29 @@ public class UserManagerImpl implements UserManager {
     public boolean enviarCodigoVerificacion(User u) {
         Session session = null;
         try {
-            // 1. Generar el código
-            int code = (int) (Math.random() * 900000) + 100000;
-            String codigoStr = String.valueOf(code);
+            // 1. LÓGICA DE SEGURIDAD (Esto arregla tu null)
+            // Si por alguna razón el objeto no tiene el código cargado, lo generamos aquí.
+            if (u.getCodigoVerificacion() == null || u.getCodigoVerificacion().isEmpty()) {
+                String nuevoCodigo = String.valueOf((int) (Math.random() * 900000) + 100000);
+                u.setCodigoVerificacion(nuevoCodigo);
+                System.out.println("⚠️ El código venía nulo, se ha generado uno nuevo: " + nuevoCodigo);
+            }
 
-            // 2. Asignar al objeto en memoria
-            u.setCodigoVerificacion(codigoStr);
-
-            // 3. Actualizar la BBDD
+            // 2. Ahora sí, actualizamos la BBDD con un código VALIDO.
             session = FactorySession.openSession();
-            session.update(u); // Asegúrate de que tu ORM tiene .update()
+            session.update(u);
 
             System.out.println("═══════════════════════════════════════");
             System.out.println("📧 CÓDIGO DE VERIFICACIÓN");
             System.out.println("Email: " + u.getEmail());
-            System.out.println("Código: " + codigoStr);
+            // Ahora esto NUNCA será null
+            System.out.println("Código: " + u.getCodigoVerificacion());
             System.out.println("═══════════════════════════════════════");
-            return true; // ÉXITO
+            return true;
 
         } catch (Exception e) {
-            logger.error("Error al generar/guardar código para " + u.getEmail() + ": " + e.getMessage());
-            return false; // FALLO
+            e.printStackTrace(); // Imprime el error completo para ver si es SQL
+            return false;
         } finally {
             if (session != null) session.close();
         }

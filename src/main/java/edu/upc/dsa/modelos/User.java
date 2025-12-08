@@ -11,38 +11,23 @@ public class User {
     private int monedas;
     private boolean emailVerificado;
     private String codigoVerificacion;
-    //private HashMap<String, Integer> inventario;
+
 
     public User() {
-        //this.inventario = new HashMap<>();
+
     }
 
     public User(String nombre, String email, String password) {
         this.nombre = nombre;
         this.email = email;
         this.password = password;
-        this.monedas = 0;
+        this.monedas = 1000;
         this.emailVerificado = false;
-        //this.inventario = new HashMap<>();
+
+
     }
 
-    /*public HashMap<String, Integer> getInventario() {
-        return inventario;
-    }
 
-    public void setInventario(HashMap<String, Integer> inventario) {
-        this.inventario = inventario;
-    }
-
-    public void addObjetoInventario(String nombreObj, int cantidad){
-        if(this.inventario.containsKey(nombreObj)){
-            int cantidadActual = this.inventario.get(nombreObj);
-            this.inventario.put(nombreObj, cantidadActual + cantidad);
-        }
-        else{
-            this.inventario.put(nombreObj, cantidad);
-        }
-    }*/
 
     public int getId() {
         return id;

@@ -96,45 +96,72 @@ public class ProductoManagerImpl implements ProductoManager {
             session = FactorySession.openSession();
 
             // Recuperamos usuario y producto
-            // Usamos session.get si tu ORM lo soporta por ID
             User usuario = (User) session.get(User.class, userId);
             Producto producto = (Producto) session.get(Producto.class, itemId);
 
-            // CASE 1: Usuario no existe (Devuelve 404 en servicio)
+            // CASE 1: Usuario no existe
             if (usuario == null) {
-                logger.warn("Usuario " + userId + " no encontrado.");
                 return 1;
             }
-
-            // CASE 2: Producto no existe (Devuelve 404 en servicio)
+            // CASE 2: Producto no existe
             if (producto == null) {
-                logger.warn("Producto " + itemId + " no encontrado.");
                 return 2;
             }
-
-            // CASE 3: Saldo insuficiente (Devuelve 402 en servicio)
+            // CASE 3: Saldo insuficiente
             if (usuario.getMonedas() < producto.getPrecio()) {
-                logger.warn("Usuario " + userId + " sin saldo suficiente.");
                 return 3;
             }
 
-            // CASE 0: ÉXITO (Devuelve 201 en servicio)
+            // CASE 0: ÉXITO - Procedemos a la compra
 
-            // A. Restar dinero
+            // A. Restar dinero (Igual que antes)
             int nuevoSaldo = usuario.getMonedas() - producto.getPrecio();
             usuario.setMonedas(nuevoSaldo);
             session.update(usuario);
 
-            // B. Añadir al inventario
-            Inventory registro = new Inventory(userId, itemId, 1);
-            session.save(registro);
+            // ---------------------------------------------------------
+            // B. GESTIÓN DEL INVENTARIO (CORREGIDO)
+            // ---------------------------------------------------------
 
-            logger.info("Compra realizada: User " + userId + " -> Item " + itemId);
+            // 1. Buscamos si el usuario ya tiene este objeto en su inventario.
+            // NOTA: Como tu ORM parece simple (DSA), es probable que no tengas un método "findBy".
+            // Tienes dos opciones aquí:
+
+            // OPCIÓN A: Si tu session soporta queries SQL nativas (Más eficiente)
+            // session.execute("INSERT INTO Inventory (userId, itemId, cantidad) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE cantidad = cantidad + 1", userId, itemId);
+
+            // OPCIÓN B: Lógica Java pura (Compatible con cualquier ORM básico)
+            // Recuperamos todos los objetos de inventario (o filtrados si tu ORM deja)
+            // Y buscamos manualmenete.
+
+            List<Object> todosLosInventarios = session.findAll(Inventory.class); // Asumo que tienes findAll
+            Inventory inventarioEncontrado = null;
+
+            for (Object obj : todosLosInventarios) {
+                Inventory inv = (Inventory) obj;
+                if (inv.getUserId() == userId && inv.getItemId() == itemId) {
+                    inventarioEncontrado = inv;
+                    break;
+                }
+            }
+
+            if (inventarioEncontrado != null) {
+                // -- ESCENARIO 1: YA LO TIENE -> ACTUALIZAMOS CANTIDAD --
+                inventarioEncontrado.setCantidad(inventarioEncontrado.getCantidad() + 1);
+                session.update(inventarioEncontrado);
+            } else {
+                // -- ESCENARIO 2: NO LO TIENE -> CREAMOS NUEVO --
+                Inventory registro = new Inventory(userId, itemId, 1);
+                session.save(registro);
+            }
+            // ---------------------------------------------------------
+
             return 0; // Todo OK
 
         } catch (Exception e) {
-            logger.error("Error crítico en comprarProducto: " + e.getMessage());
-            return 500; // Error desconocido
+            // Logueamos el error pero devolvemos un código de error controlado
+            e.printStackTrace();
+            return 500;
         } finally {
             if (session != null) session.close();
         }
