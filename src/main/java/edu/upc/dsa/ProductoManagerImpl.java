@@ -83,7 +83,7 @@ public class ProductoManagerImpl implements ProductoManager {
         u.setMonedas(u.getMonedas() - p.getPrecio());
 
         // Añadimos al inventario (usando el método que creamos antes)
-        u.addObjetoInventario(p.getNombreproducto(), 1);
+        //u.addObjetoInventario(p.getNombreproducto(), 1);
 
         System.out.println("Compra realizada: " + u.getNombre() + " compró " + p.getNombreproducto());
 

@@ -146,7 +146,7 @@ public class Servicio {
                 return Response.status(Response.Status.UNAUTHORIZED) // 401 Unauthorized
                         .entity("Credenciales inválidas").build();
             }
-            if (!usuarioLogueado.isEmailVerificado()) {
+            if (!usuarioLogueado.getEmailVerificado()) {
                 return Response.status(Response.Status.FORBIDDEN)
                         .entity("Por favor verifica tu email antes de iniciar sesión.").build();
             }
