@@ -166,4 +166,20 @@ public class ProductoManagerImpl implements ProductoManager {
             if (session != null) session.close();
         }
     }
+    // En ProductoManagerImpl.java
+
+    @Override
+    public void eliminarProducto(int id) { // O String id, según como tengas tu ID
+        Session session = null;
+        try {
+            session = FactorySession.openSession();
+            Producto p = new Producto();
+            p.setId(id); // Asegúrate de que tu objeto tiene el ID seteado
+            session.delete(p); // Tu ORM debe tener función delete
+        } catch (Exception e) {
+            // Log del error
+        } finally {
+            if (session != null) session.close();
+        }
+    }
 }

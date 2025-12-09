@@ -16,21 +16,23 @@ public class SessionImpl implements Session {
     }
 
     @Override
-    public void save(Object entity) {
+    public void save(Object entity) throws SQLException { // 1. Añade throws
         String insertQuery = QueryHelper.createInsertQuery(entity);
-        try {
-            PreparedStatement pstm = conn.prepareStatement(insertQuery);
-            int i = 1;
-            for (String field : ObjectHelper.getFields(entity)) {
-                if (field.equals("id")) continue;
-                Object value = ObjectHelper.getter(entity, field);
-                pstm.setObject(i++, value);
-            }
-            pstm.executeQuery();
-            System.out.println("Objeto guardado correctamente: " + entity.getClass().getSimpleName());
-        } catch (SQLException e) {
-            e.printStackTrace();
+
+        // Eliminamos el try-catch para que el error suba
+        PreparedStatement pstm = conn.prepareStatement(insertQuery);
+        int i = 1;
+        for (String field : ObjectHelper.getFields(entity)) {
+            if (field.equals("id")) continue;
+            Object value = ObjectHelper.getter(entity, field);
+            pstm.setObject(i++, value);
         }
+
+        // Usamos execute() o executeUpdate() para INSERTs
+        pstm.execute();
+
+        // Si llega aquí es que NO hubo error
+        System.out.println("Objeto guardado correctamente: " + entity.getClass().getSimpleName());
     }
 
     @Override

@@ -10,4 +10,5 @@ public interface ProductoManager {
     Producto addProducto(String nombreproducto, int precio);//pongo este por si queremos que el id venga del rest
     //Producto encontrarproducto (String nombreproducto);
     int comprarProducto (int userID, int productoID);
+    void eliminarProducto (int id);
 }

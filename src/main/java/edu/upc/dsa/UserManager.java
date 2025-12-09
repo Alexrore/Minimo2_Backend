@@ -10,4 +10,5 @@ public interface UserManager {
     List<User> getUsuarios();
     boolean enviarCodigoVerificacion(User u);
     boolean verificarCodigo(String email, String codigo);
+    void eliminarUsuario(String email);
 }

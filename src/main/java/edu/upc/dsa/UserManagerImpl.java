@@ -25,8 +25,8 @@ public class UserManagerImpl implements UserManager {
     public User registrarUsuario(String nombre, String email, String password) {
         Session session = null;
         User u = null;
-        try {
-            session = FactorySession.openSession();
+
+
 
             // 1. Crear objeto Java
             u = new User(nombre, email, password);
@@ -37,26 +37,19 @@ public class UserManagerImpl implements UserManager {
             u.setCodigoVerificacion(codigo);
             u.setEmailVerificado(false); // O el valor numérico 0 si usas int
 
-            // 3. Guardar en BBDD (INSERT)
-            // Como ya lleva el código, se guarda todo junto.
-            session.save(u);
+        try {
+            session = FactorySession.openSession();
+            session.save(u); // Si esto falla (duplicado), salta al catch
 
             logger.info("Usuario registrado: " + email);
-            return u;
+            return u; // Solo llegamos aquí si NO hay error
 
         } catch (Exception e) {
-            // Capturar duplicados
-            if (e.getMessage() != null && e.getMessage().contains("Duplicate")) {
-                logger.error("El email ya existe: " + email);
-            } else {
-                logger.error("Error al registrar: " + e.getMessage());
-            }
-            return null;
+            // SI ENTRA AQUÍ, ES QUE HUBO ERROR (DUPLICADO)
+            logger.error("Error al registrar: " + e.getMessage());
+            return null; // <--- ESTO ES LA CLAVE. Tenemos que devolver null para que el test sepa que falló.
         } finally {
-            // 4. Cerrar sesión sin usar isOpen() (solo verificamos null)
-            if (session != null) {
-                session.close();
-            }
+            if (session != null) session.close();
         }
     }
 
@@ -117,12 +110,32 @@ public class UserManagerImpl implements UserManager {
         return usuarioEncontrado;
     }
 
-    @Override
-    public List<User> getUsuarios() {
-        return usuarios;
-    }
 
     // En UserManagerImpl.java
+
+    @Override
+    public List<User> getUsuarios() {
+        Session session = null;
+        List<User> lista = new ArrayList<>();
+        try {
+            session = FactorySession.openSession();
+            // findAll devuelve List<Object>, lo casteamos a User
+            List<Object> rawList = session.findAll(User.class);
+
+            if (rawList != null) {
+                for (Object o : rawList) {
+                    lista.add((User) o);
+                }
+            }
+        } catch (Exception e) {
+            // Si la tabla está vacía o falla, devolvemos lista vacía, no error
+            logger.warn("Error o lista vacía: " + e.getMessage());
+        } finally {
+            if (session != null) session.close();
+        }
+        return lista;
+    }
+
 
     public boolean enviarCodigoVerificacion(User u) {
         Session session = null;
@@ -191,6 +204,29 @@ public class UserManagerImpl implements UserManager {
             if (session != null) {
                 session.close();
             }
+        }
+    }
+    // En UserManagerImpl.java
+
+    public void eliminarUsuario(String email) {
+        Session session = null;
+        try {
+            // 1. PRIMERO RECUPERAMOS EL USUARIO COMPLETO (CON ID)
+            // Usamos tu función getUsuario que sabemos que funciona
+            User usuarioReal = this.getUsuario(email);
+
+            if (usuarioReal != null) {
+                session = FactorySession.openSession();
+                // 2. AHORA BORRAMOS EL OBJETO QUE SÍ TIENE ID
+                session.delete(usuarioReal);
+                logger.info("Usuario eliminado correctamente de BBDD: " + email);
+            } else {
+                logger.warn("Intentando borrar usuario inexistente: " + email);
+            }
+        } catch (Exception e) {
+            logger.error("Error al eliminar usuario: " + e.getMessage());
+        } finally {
+            if (session != null) session.close();
         }
     }
 }

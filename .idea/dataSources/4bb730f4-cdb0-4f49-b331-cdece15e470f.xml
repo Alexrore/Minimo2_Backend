@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="void_gate_db">
-  <database-model serializer="dbm" dbms="MARIADB" family-id="MARIADB" format-version="4.53">
+  <database-model serializer="dbm" dbms="MARIADB" family-id="MARIADB" format-version="4.54">
     <root id="1">
       <DefaultAuthPlugin>mysql_native_password</DefaultAuthPlugin>
       <DefaultCasing>lower/lower</DefaultCasing>
@@ -1587,7 +1587,7 @@ test\\_%|schema||PUBLIC|&apos;&apos;|UPDATE|G</Grants>
     <schema id="560" parent="1" name="void_gate">
       <AutoIntrospectionLevel>3</AutoIntrospectionLevel>
       <LastIntrospectionLevel>3</LastIntrospectionLevel>
-      <LastIntrospectionLocalTimestamp>2025-12-08.21:21:59</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2025-12-09.08:57:32</LastIntrospectionLocalTimestamp>
       <CollationName>utf8mb4_uca1400_ai_ci</CollationName>
     </schema>
     <user id="561" parent="1" name="mariadb.sys">
@@ -1624,7 +1624,7 @@ test\\_%|schema||PUBLIC|&apos;&apos;|UPDATE|G</Grants>
       <CollationName>utf8mb4_uca1400_ai_ci</CollationName>
     </table>
     <column id="570" parent="567" name="id">
-      <AutoIncrement>1</AutoIncrement>
+      <AutoIncrement>4</AutoIncrement>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>int(11)|0s</StoredType>
@@ -1680,7 +1680,7 @@ itemId</ColNames>
       <UnderlyingIndexName>userId</UnderlyingIndexName>
     </key>
     <column id="581" parent="568" name="id">
-      <AutoIncrement>1</AutoIncrement>
+      <AutoIncrement>9</AutoIncrement>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>int(11)|0s</StoredType>
@@ -1706,7 +1706,7 @@ itemId</ColNames>
       <UnderlyingIndexName>PRIMARY</UnderlyingIndexName>
     </key>
     <column id="586" parent="569" name="id">
-      <AutoIncrement>1</AutoIncrement>
+      <AutoIncrement>10</AutoIncrement>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StoredType>int(11)|0s</StoredType>
