@@ -524,7 +524,7 @@
 
         function cargarInventario() {
             const user = window.userData;
-            // Validación básica
+            // Validación de seguridad
             if(!user || !user.inventario) {
                 $("#inventory-grid").empty();
                 $("#inventory-grid").html('<div class="text-center text-muted p-5">Inventario no disponible.</div>');
@@ -540,10 +540,9 @@
                 return;
             }
 
-            // --- CORRECCIÓN AQUÍ: Iteramos como una LISTA (Array), no como un Mapa ---
+            // --- CORRECCIÓN: Usamos forEach directo sobre la lista ---
             inventario.forEach(item => {
-                // Ahora accedemos a las propiedades del objeto Java
-                // Nota: Usamos item.nombre (que añadimos en el Backend) y item.cantidad
+                // Ahora leemos las propiedades del objeto que envía Java
                 const nombre = item.nombre || "Objeto Desconocido";
                 const cantidad = item.cantidad;
 
