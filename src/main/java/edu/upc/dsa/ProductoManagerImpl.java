@@ -174,16 +174,27 @@ public class ProductoManagerImpl implements ProductoManager {
         List<Inventory> inventarioUsuario = new LinkedList<>();
         try {
             session = FactorySession.openSession();
-            // Traemos toda la tabla de inventarios (limitación de tu ORM)
+
+            // 1. Recuperamos TODOS los inventarios (Limitación de tu ORM)
             List<Object> todos = session.findAll(Inventory.class);
 
             for (Object obj : todos) {
                 Inventory inv = (Inventory) obj;
-                // Filtramos manualmente: Solo los de este usuario
+
+                // 2. Filtramos solo los de este usuario
                 if (inv.getUserId() == userId) {
-                    // OPCIONAL: Si tu objeto Inventory solo tiene ID de producto,
-                    // aquí podrías buscar el nombre del producto para que el frontend no reciba solo números.
-                    // Pero por ahora, devolvamos el objeto tal cual.
+
+                    // --- LA MAGIA: "JOIN" MANUAL ---
+                    // Buscamos el Producto usando el itemId que tenemos en el inventario
+                    Producto p = (Producto) session.get(Producto.class, inv.getItemId());
+
+                    if (p != null) {
+                        // Le asignamos el nombre al objeto inventario para que viaje al frontend
+                        inv.setNombre(p.getNombre());
+                    } else {
+                        inv.setNombre("Item Desconocido");
+                    }
+
                     inventarioUsuario.add(inv);
                 }
             }

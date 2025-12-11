@@ -1,10 +1,13 @@
 package edu.upc.dsa.modelos;
 
 public class Inventory {
-    private int id;
-    private int userId;
-    private int itemId; // ID del producto
-    private int cantidad;
+    int id;
+    int userId;
+    int itemId;
+    int cantidad;
+
+    // --- NUEVO CAMPO (NO ESTÁ EN BBDD, SOLO PARA JSON) ---
+    String nombre;
 
     public Inventory() {}
 
@@ -14,7 +17,7 @@ public class Inventory {
         this.cantidad = cantidad;
     }
 
-    // Getters y Setters necesarios para el ORM
+    // --- GETTERS Y SETTERS ---
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public int getUserId() { return userId; }
@@ -23,4 +26,8 @@ public class Inventory {
     public void setItemId(int itemId) { this.itemId = itemId; }
     public int getCantidad() { return cantidad; }
     public void setCantidad(int cantidad) { this.cantidad = cantidad; }
+
+    // ¡¡¡ IMPORTANTE !!!
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
 }
