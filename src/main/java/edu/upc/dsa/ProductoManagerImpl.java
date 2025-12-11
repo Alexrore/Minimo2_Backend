@@ -188,12 +188,7 @@ public class ProductoManagerImpl implements ProductoManager {
                     // Buscamos el Producto usando el itemId que tenemos en el inventario
                     Producto p = (Producto) session.get(Producto.class, inv.getItemId());
 
-                    if (p != null) {
-                        // Le asignamos el nombre al objeto inventario para que viaje al frontend
-                        inv.setNombre(p.getNombre());
-                    } else {
-                        inv.setNombre("Item Desconocido");
-                    }
+
 
                     inventarioUsuario.add(inv);
                 }

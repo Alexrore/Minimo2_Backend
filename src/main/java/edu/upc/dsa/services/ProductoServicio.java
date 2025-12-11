@@ -2,8 +2,7 @@ package edu.upc.dsa.services;
 
 import edu.upc.dsa.ProductoManager;
 import edu.upc.dsa.ProductoManagerImpl;
-import edu.upc.dsa.modelos.Producto;
-import edu.upc.dsa.modelos.ObjetoCompra;
+import edu.upc.dsa.modelos.*;
 import io.swagger.annotations.*;
 
 import javax.ws.rs.*;
@@ -50,6 +49,7 @@ public class ProductoServicio {
                     .entity("Error interno del servidor: " + e.getMessage()).build();
         }
     }
+
 
     @POST
     @Path("/")
@@ -158,6 +158,25 @@ public class ProductoServicio {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error interno del servidor: " + e.getMessage()).build();
+        }
+    }
+    @GET
+    @Path("/inventario/{userId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Obtener inventario de usuario",
+            notes = "Devuelve la lista de objetos (IDs) que tiene el usuario.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Inventario encontrado"),
+            @ApiResponse(code = 500, message = "Error interno")
+    })
+    public Response getInventarioUsuario(@PathParam("userId") int userId) {
+        try {
+            // Llamamos al manager que devuelve la lista limpia (sin nombres, solo IDs)
+            List<Inventory> inventario = this.pm.getInventario(userId);
+            return Response.status(Response.Status.OK).entity(inventario).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al cargar inventario").build();
         }
     }
 }

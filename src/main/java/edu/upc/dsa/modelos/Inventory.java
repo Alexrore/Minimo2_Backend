@@ -1,15 +1,10 @@
 package edu.upc.dsa.modelos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class Inventory {
     int id;
     int userId;
     int itemId;
     int cantidad;
-
-    // --- NUEVO CAMPO (NO ESTÁ EN BBDD, SOLO PARA JSON) ---
-    transient String nombre;
 
     public Inventory() {}
 
@@ -19,7 +14,7 @@ public class Inventory {
         this.cantidad = cantidad;
     }
 
-    // --- GETTERS Y SETTERS ---
+    // Getters y Setters básicos
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public int getUserId() { return userId; }
@@ -28,8 +23,4 @@ public class Inventory {
     public void setItemId(int itemId) { this.itemId = itemId; }
     public int getCantidad() { return cantidad; }
     public void setCantidad(int cantidad) { this.cantidad = cantidad; }
-
-    @JsonProperty("nombre")
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
 }

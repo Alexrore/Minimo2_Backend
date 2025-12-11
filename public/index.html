@@ -437,6 +437,7 @@
 
         function cargarTienda() {
             $.get(URL_PROD + "/", function (productos) {
+                catalogoProductos = productos;
                 $("#shop-grid").empty();
                 if(productos.length === 0) {
                     $("#shop-grid").html('<div class="text-center text-muted">Tienda vacía. Usa la Forja.</div>');
@@ -523,36 +524,39 @@
         };
 
         function cargarInventario() {
-            const user = window.userData;
-            // Validación de seguridad
-            if(!user || !user.inventario) {
-                $("#inventory-grid").empty();
-                $("#inventory-grid").html('<div class="text-center text-muted p-5">Inventario no disponible.</div>');
-                return;
-            }
+            // Obtenemos el ID del usuario de la sesión
+            let userId = sessionStorage.getItem("userId");
 
-            const inventario = user.inventario;
-            $("#inventory-grid").empty();
+            // Hacemos una petición directa a la base de datos de inventario
+            $.ajax({
+                url: URL_PROD + "/inventario/" + userId, // Asegúrate que esta ruta coincide con tu Backend
+                type: "GET",
+                success: function(listaInventario) {
+                    $("#inventory-grid").empty();
 
-            // Si la lista está vacía
-            if (inventario.length === 0) {
-                $("#inventory-grid").html('<div class="text-center text-muted p-5">Tu inventario está vacío.</div>');
-                return;
-            }
+                    if (listaInventario.length === 0) {
+                        $("#inventory-grid").html('<div class="text-center text-muted p-5">Tu inventario está vacío.</div>');
+                        return;
+                    }
 
-            // --- CORRECCIÓN: Usamos forEach directo sobre la lista ---
-            inventario.forEach(item => {
-                // Ahora leemos las propiedades del objeto que envía Java
-                const nombre = item.nombre || "Objeto Desconocido";
-                const cantidad = item.cantidad;
+                    listaInventario.forEach(item => {
+                        // AQUÍ ESTÁ EL TRUCO:
+                        // Tenemos item.itemId (ej: 2) pero no el nombre.
+                        // Buscamos en el catálogo qué producto tiene el ID 2.
+                        let productoReal = catalogoProductos.find(p => p.id === item.itemId);
 
-                // Lógica de imagen
-                let imgHTML = `<i class="bi bi-backpack fs-1 text-info"></i>`;
-                if(IMAGENES_PRODUCTOS[nombre]) {
-                    imgHTML = `<img src="${IMAGENES_PRODUCTOS[nombre]}" class="product-img" alt="${nombre}">`;
-                }
+                        // Si encontramos el producto, usamos su nombre. Si no, ponemos "Item X"
+                        let nombre = productoReal ? productoReal.nombre : "Item Desconocido (" + item.itemId + ")";
+                        let cantidad = item.cantidad;
 
-                $("#inventory-grid").append(`
+                        // Lógica de imagen (sigue igual)
+                        let imgHTML = `<i class="bi bi-backpack fs-1 text-info"></i>`;
+                        if(IMAGENES_PRODUCTOS[nombre]) {
+                            imgHTML = `<img src="${IMAGENES_PRODUCTOS[nombre]}" class="product-img" alt="${nombre}">`;
+                        }
+
+                        // Renderizamos
+                        $("#inventory-grid").append(`
                     <div class="col-md-3 mb-3">
                         <div class="item-card border-info">
                             <span class="item-qty">${cantidad}</span>
@@ -563,6 +567,11 @@
                         </div>
                     </div>
                 `);
+                    });
+                },
+                error: function() {
+                    $("#inventory-grid").html('<div class="text-center text-danger p-5">Error cargando inventario.</div>');
+                }
             });
         }
 
