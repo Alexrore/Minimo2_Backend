@@ -7,7 +7,7 @@ public class Inventory {
     int cantidad;
 
     // --- NUEVO CAMPO (NO ESTÁ EN BBDD, SOLO PARA JSON) ---
-    String nombre;
+    transient String nombre;
 
     public Inventory() {}
 
