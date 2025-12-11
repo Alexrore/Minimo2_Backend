@@ -1,5 +1,7 @@
 package edu.upc.dsa.modelos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.LinkedList;
 import java.util.List; // <--- IMPRESCINDIBLE PARA QUE FUNCIONE LA LISTA
 
@@ -89,7 +91,7 @@ public class User {
     }
 
     // --- NUEVOS MÉTODOS PARA EL INVENTARIO ---
-    // Sin esto, el JSON no mostrará los objetos aunque los tengas cargados
+    @JsonProperty("inventario")
     public List<Inventory> getInventario() {
         return inventario;
     }

@@ -1,5 +1,7 @@
 package edu.upc.dsa.modelos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Inventory {
     int id;
     int userId;
@@ -27,7 +29,7 @@ public class Inventory {
     public int getCantidad() { return cantidad; }
     public void setCantidad(int cantidad) { this.cantidad = cantidad; }
 
-    // ¡¡¡ IMPORTANTE !!!
+    @JsonProperty("nombre")
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 }
