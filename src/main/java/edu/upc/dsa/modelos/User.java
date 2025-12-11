@@ -1,7 +1,7 @@
 package edu.upc.dsa.modelos;
 
-import java.util.HashMap;
-
+import java.util.LinkedList;
+import java.util.List; // <--- IMPRESCINDIBLE PARA QUE FUNCIONE LA LISTA
 
 public class User {
     private int id;
@@ -12,9 +12,13 @@ public class User {
     private boolean emailVerificado;
     private String codigoVerificacion;
 
+    // --- NUEVO CAMPO PARA EL JSON ---
+    // Esto guardará los objetos que recuperamos en el UserManager
+    private List<Inventory> inventario;
 
     public User() {
-
+        // Inicializamos la lista vacía para evitar errores de "NullPointerException"
+        this.inventario = new LinkedList<>();
     }
 
     public User(String nombre, String email, String password) {
@@ -23,11 +27,10 @@ public class User {
         this.password = password;
         this.monedas = 1000;
         this.emailVerificado = false;
-
-
+        this.inventario = new LinkedList<>(); // Inicializamos aquí también
     }
 
-
+    // --- GETTERS Y SETTERS ---
 
     public int getId() {
         return id;
@@ -77,7 +80,6 @@ public class User {
         this.codigoVerificacion = codigoVerificacion;
     }
 
-
     public int getMonedas() {
         return monedas;
     }
@@ -85,5 +87,14 @@ public class User {
     public void setMonedas(int monedas) {
         this.monedas = monedas;
     }
-}
 
+    // --- NUEVOS MÉTODOS PARA EL INVENTARIO ---
+    // Sin esto, el JSON no mostrará los objetos aunque los tengas cargados
+    public List<Inventory> getInventario() {
+        return inventario;
+    }
+
+    public void setInventario(List<Inventory> inventario) {
+        this.inventario = inventario;
+    }
+}

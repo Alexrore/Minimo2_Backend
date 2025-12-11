@@ -2,7 +2,7 @@ package edu.upc.dsa;
 
 import edu.upc.dsa.modelos.User;
 
-import java.sql.SQLIntegrityConstraintViolationException;
+import edu.upc.dsa.modelos.Inventory;
 import java.util.*;
 import edu.upc.dsa.dao.*;
 import org.apache.log4j.Logger;
@@ -58,15 +58,19 @@ public class UserManagerImpl implements UserManager {
         Session session = null;
         try {
             session = FactorySession.openSession();
-
-            // Como no tenemos 'findByEmail', traemos todos y filtramos
-            // (No es lo más eficiente pero es lo estándar en este nivel de ORM)
             List<Object> usersList = session.findAll(User.class);
 
             for (Object obj : usersList) {
                 User u = (User) obj;
                 if (u.getEmail().equals(email) && u.getPassword().equals(password)) {
                     logger.info("Login exitoso: " + email);
+
+                    // --- NUEVO CÓDIGO: CARGAR INVENTARIO ---
+                    // Llamamos al método que creaste en ProductoManager para llenar la lista
+                    List<Inventory> suInventario = ProductoManagerImpl.getInstance().getInventario(u.getId());
+                    u.setInventario(suInventario);
+                    // ---------------------------------------
+
                     return u;
                 }
             }
@@ -85,18 +89,21 @@ public class UserManagerImpl implements UserManager {
         User usuarioEncontrado = null;
         try {
             session = FactorySession.openSession();
-
-            // 1. SOLUCIÓN: Usar findAll con 1 solo argumento (trae todo)
-            // Esto elimina el error "Expected 1 argument but found 2"
             List<Object> allUsers = session.findAll(User.class);
 
-            // 2. Buscamos manualmente en la lista devuelta
             if (allUsers != null) {
                 for (Object obj : allUsers) {
                     User u = (User) obj;
                     if (u.getEmail().equals(email)) {
+
+                        // --- NUEVO CÓDIGO: CARGAR INVENTARIO ---
+                        // Recuperamos el inventario para este usuario específico
+                        List<Inventory> suInventario = ProductoManagerImpl.getInstance().getInventario(u.getId());
+                        u.setInventario(suInventario);
+                        // ---------------------------------------
+
                         usuarioEncontrado = u;
-                        break; // Ya lo tenemos, salimos del bucle
+                        break;
                     }
                 }
             }

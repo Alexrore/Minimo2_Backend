@@ -166,7 +166,34 @@ public class ProductoManagerImpl implements ProductoManager {
             if (session != null) session.close();
         }
     }
-    // En ProductoManagerImpl.java
+
+
+    @Override
+    public List<Inventory> getInventario(int userId) {
+        Session session = null;
+        List<Inventory> inventarioUsuario = new LinkedList<>();
+        try {
+            session = FactorySession.openSession();
+            // Traemos toda la tabla de inventarios (limitación de tu ORM)
+            List<Object> todos = session.findAll(Inventory.class);
+
+            for (Object obj : todos) {
+                Inventory inv = (Inventory) obj;
+                // Filtramos manualmente: Solo los de este usuario
+                if (inv.getUserId() == userId) {
+                    // OPCIONAL: Si tu objeto Inventory solo tiene ID de producto,
+                    // aquí podrías buscar el nombre del producto para que el frontend no reciba solo números.
+                    // Pero por ahora, devolvamos el objeto tal cual.
+                    inventarioUsuario.add(inv);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error al obtener inventario: " + e.getMessage());
+        } finally {
+            if (session != null) session.close();
+        }
+        return inventarioUsuario;
+    }
 
     @Override
     public void eliminarProducto(int id) { // O String id, según como tengas tu ID
