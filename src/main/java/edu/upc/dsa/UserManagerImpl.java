@@ -1,7 +1,9 @@
 package edu.upc.dsa;
 
 import edu.upc.dsa.modelos.User;
-import edu.upc.dsa.dao.*;
+import edu.upc.dsa.modelos.Evento;
+import edu.upc.dsa.dao.Session;
+import edu.upc.dsa.dao.FactorySession;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -9,10 +11,12 @@ import java.util.*;
 public class UserManagerImpl implements UserManager {
     private static UserManagerImpl instance;
     private List<User> usuarios;
+    private List<Evento> eventos;
     final static Logger logger = Logger.getLogger(UserManagerImpl.class);
 
     private UserManagerImpl() {
         usuarios = new ArrayList<>();
+        eventos = new ArrayList<>();
     }
 
     public static UserManagerImpl getInstance() {
@@ -198,5 +202,44 @@ public class UserManagerImpl implements UserManager {
         } finally {
             if (session != null) session.close();
         }
+    }
+    @Override
+    public void addEvento(Evento e) {
+        Session session = null;
+        try {
+            if(e.getId() == null || e.getId().isEmpty()) {
+                e.setId(UUID.randomUUID().toString());
+            }
+
+            session = FactorySession.openSession();
+            session.save(e);
+
+            logger.info("Evento registrado: " + e.getNombre() + " (ID: " + e.getId() + ")");
+        } catch (Exception ex) {
+            logger.error("Error al guardar evento: " + ex.getMessage());
+        } finally {
+            if (session != null) session.close();
+        }
+    }
+
+    @Override
+    public List<Evento> getEventos() {
+        Session session = null;
+        List<Evento> listaEventos = new ArrayList<>();
+        try {
+            session = FactorySession.openSession();
+            List<Object> rawList = session.findAll(Evento.class);
+
+            if (rawList != null) {
+                for (Object o : rawList) {
+                    listaEventos.add((Evento) o);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error al obtener eventos: " + e.getMessage());
+        } finally {
+            if (session != null) session.close();
+        }
+        return listaEventos;
     }
 }

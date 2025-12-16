@@ -1,6 +1,6 @@
 package edu.upc.dsa;
 
-import edu.upc.dsa.modelos.User;
+import edu.upc.dsa.modelos.*;
 import java.util.List;
 
 public interface UserManager {
@@ -11,4 +11,6 @@ public interface UserManager {
     boolean enviarCodigoVerificacion(User u);
     boolean verificarCodigo(String email, String codigo);
     void eliminarUsuario(String email);
+    void addEvento(Evento e);
+    List<Evento> getEventos();
 }

@@ -1,14 +1,15 @@
 package edu.upc.dsa.services;
 
-import edu.upc.dsa.UserManager;
-import edu.upc.dsa.UserManagerImpl;
-import edu.upc.dsa.modelos.User;
-import edu.upc.dsa.modelos.Verificacion;
+
+import edu.upc.dsa.*;
+import edu.upc.dsa.modelos.*;
+
 import io.swagger.annotations.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 @Api(value = "/usuarios", description = "Servicios de usuarios")
 @Path("/usuarios")
@@ -210,6 +211,51 @@ public class Servicio {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error interno: " + e.getMessage()).build();
+        }
+    }
+    @POST
+    @Path("/eventos")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Crear un nuevo evento", notes = "Añade un evento con fechas e imagen")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Evento creado exitosamente"),
+            @ApiResponse(code = 400, message = "Faltan datos obligatorios"),
+            @ApiResponse(code = 500, message = "Error interno")
+    })
+    public Response crearEvento(Evento evento) {
+        try {
+            if (evento == null || evento.getNombre() == null || evento.getFechaInicio() == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("Faltan datos obligatorios (nombre o fecha de inicio)").build();
+            }
+
+            m.addEvento(evento);
+
+            return Response.status(Response.Status.CREATED).entity(evento).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al crear el evento").build();
+        }
+    }
+
+    @GET
+    @Path("/eventos")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Obtener lista de eventos", notes = "Devuelve todos los eventos")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Lista obtenida"),
+            @ApiResponse(code = 500, message = "Error interno")
+    })
+    public Response getEventos() {
+        try {
+            List<Evento> lista = m.getEventos();
+            return Response.status(Response.Status.OK).entity(lista).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al obtener eventos").build();
         }
     }
 }
