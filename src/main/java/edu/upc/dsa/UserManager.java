@@ -13,4 +13,5 @@ public interface UserManager {
     void eliminarUsuario(String email);
     void addEvento(Evento e);
     List<Evento> getEventos();
+    boolean participarEvento(String idUsuario, String idEvento);
 }

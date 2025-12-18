@@ -239,6 +239,23 @@ public class Servicio {
                     .entity("Error al crear el evento").build();
         }
     }
+    @POST
+    @Path("/eventos/participar")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response participarEvento(EventoParticipacion participacion) {
+        if (participacion.getIdUsuario() == null || participacion.getIdEvento() == null) {
+            return Response.status(400).entity("Faltan IDs").build();
+        }
+
+        boolean exito = m.participarEvento(participacion.getIdUsuario(), participacion.getIdEvento());
+
+        if (exito) {
+            return Response.status(201).entity("Inscripción realizada").build();
+        } else {
+            return Response.status(500).entity("Error al inscribirse").build();
+        }
+    }
 
     @GET
     @Path("/eventos")

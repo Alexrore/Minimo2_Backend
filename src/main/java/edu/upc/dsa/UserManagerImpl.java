@@ -221,6 +221,11 @@ public class UserManagerImpl implements UserManager {
             if (session != null) session.close();
         }
     }
+    @Override
+    public boolean participarEvento(String idUsuario, String idEvento) {
+        logger.info("Usuario " + idUsuario + " se ha apuntado al evento " + idEvento);
+        return true;
+    }
 
     @Override
     public List<Evento> getEventos() {
